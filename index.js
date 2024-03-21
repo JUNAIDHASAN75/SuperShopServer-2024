@@ -26,6 +26,7 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     const menuCollections = client.db("SuperShop2024").collection("menues");
+    const reviewCollections = client.db("SuperShop2024").collection("reviews");
     const cartCollections = client.db("SuperShop2024").collection("carts");
     const userCollections = client.db("SuperShop2024").collection("users");
     app.get("/menues", async (req, res) => {
@@ -33,18 +34,28 @@ async function run() {
       res.send(result);
     });
 
-    app.post('/menues', async(req, res)=>{
+    app.post("/menues", async (req, res) => {
       const body = req.body;
       const result = await menuCollections.insertOne(body);
       res.send(result);
-    })
+    });
 
-    app.delete('/menues/:id', async(req, res)=>{
+    app.delete("/menues/:id", async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)};
+      const query = { _id: new ObjectId(id) };
       const result = await menuCollections.deleteOne(query);
-      res.send(result)
-    })
+      res.send(result);
+    });
+    // reviews
+    app.get("/reviews", async (req, res) => {
+      const result = await reviewCollections.find().toArray();
+      res.send(result);
+    });
+    app.post("/reviews", async (req, res) => {
+      const query = req.body;
+      const result = await reviewCollections(query);
+      res.send(result);
+    });
     app.get("/carts", async (req, res) => {
       const email = req.query.email;
       const query = { email: email };
@@ -67,6 +78,12 @@ async function run() {
       const result = await userCollections.find().toArray();
       res.send(result);
     });
+    app.get("/users/:id", async(req,res)=>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await userCollections.findOne(query);
+      res.send(result);
+    })
 
     app.post("/users", async (req, res) => {
       const query = req.body;
@@ -78,7 +95,7 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await userCollections.deleteOne(query);
-      res.send(result)
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
